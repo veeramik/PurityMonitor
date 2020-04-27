@@ -18,6 +18,8 @@ void Pr3_fitting_anode() {
 	cout << u << " " << v << endl;
       TFile *f3 = new TFile(Form("/unix/dune/purity/stefano/gas_ar/silver/second_24_hours/Field_60.120.240Vcm_FibreIn_0%d.0%d.ch3.traces.root", u, v), "read");
 
+      //creating file for the times
+
       TFile *f1 = new TFile(Form("silver/times/silver_average_%d.%d_fitvalues%d_PreAmpFunc_second24_gas_ar_anode_times.root", u, v), "recreate");
 
       TTree *timetree = new TTree("Timetree", "Timetree");
@@ -27,35 +29,6 @@ void Pr3_fitting_anode() {
       timetree->Fill();
       f1->Write();
       f1->Close();
-      //timetree->Close();
-
-      //double Times[10][9] = {0}{0};
-      //string line;
-      //short loop = 0;
-      //short loop2 = 0;
-      //ifstream times;
-      
-      //times.open(Form("/unix/dune/purity/stefano/gas_ar/gold/first_24_hours/Field_60.120.240Vcm_FibreIn_0%d.%d.ch3.traces.times", u, v));
-      //if (times.is_open())
-      //	{
-	  //while (getline(times, line)) {
-	  // cout << line << '\n';
-	   //cout << line[30] << endl;
-	   // }
-      //  string Times[80];
-
-      //  for(int s = 0; s < 80; ++s)
-      //    { 
-      //      times >> Times[s];
-	      //Times.erase(0, 6, ",");
-	      //cout << Times[s] << endl;
-      //     }
-	
-	  //cout << Times[2] << endl;
-	  //cout << Times[3] << endl;
-	  //times.close();
-	  //	 }
-
       
       	for (int i=1; i<21; i++) {
 	  TCanvas *canvas = new TCanvas("canvas");
@@ -77,30 +50,7 @@ void Pr3_fitting_anode() {
 	  ano->Draw();
 	  TF1 *fun= new TF1("fun", funcPreamp2, 0.0, 0.0005, 6);
 
-	  //fun->SetParName(0, "Q_0");                                                                                     
-	  //fun->SetParName(1, "G_0");                                                                                     
-	  //fun->SetParName(2, "t2");                                                                                      
-	  //fun->SetParName(3, "taulife");                                                                                 
-	  //fun->SetParName(4, "tauel");                                                                                  
-	  //fun->SetParName(5, "t0");                                                                                      
-	  //fun->SetParName(6, "t3");
-
-	  //fun->FixParameter(1, 1);                                                                                       
-	  //fun->FixParameter(3, 0.00122);                                                                                 
-
-	  //fun->SetParameter(3, 1e-4);                                                                                    
-	  //fun->SetParameter(5, 0);                                                                                       
-	  //fun->SetParameter(0, 120);                                                                                    
-	  //fun->SetParameter(2, 1e-5);                                                                                    
-	  //fun->SetParameter(4, 3e-4);      
-	  //fun->SetParameter(6, 1e-6);
-
-	  //fun->SetParLimits(0, -1.5, -0.7);                                                                              
-	  //fun->SetParLimits(2, 1e-5, 3e-5);                                                                              
-	  //fun->SetParLimits(2, 5e-6, 2e-5);                                                                              
-	  //fun->SetParLimits(4, 1e-5, 5e-4);                                                                              
-	  //fun->SetParLimits(4, 7e-5, 5e-4);       
-
+	 
 	  fun->SetParName(0, "Baseline");
 	  fun->SetParName(1, "Q");
 	  fun->SetParName(2, "t3");
