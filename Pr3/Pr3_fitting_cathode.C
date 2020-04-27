@@ -5,9 +5,11 @@ void Pr3_fitting_cathode() {
   TCanvas *canvas = new TCanvas("canvas");  
   int t=0, l=0;
 
-  for (int u=1; u<2; u++){
+  for (int u=17; u<19; u++){
 
   for (int v=0; v<60; v++){
+
+    //checking if file exists
 
     Bool_t f = gSystem->AccessPathName(Form("/unix/dune/purity/stefano/gas_ar/gold/first_24_hours/Field_60.120.240Vcm_FibreIn_%d.%d.ch4.traces.root", u, v));
 
@@ -25,73 +27,27 @@ void Pr3_fitting_cathode() {
       //TFile *f3 = new TFile(Form("/unix/dune/purity/stefano/vacuum/silver/first_66_hours/Field_5.10.20Vcm_FibreIn_0%d.%d.ch4.traces.root", u, v));
       //TFile *f3 = new TFile(Form("/unix/dune/purity/stefano/averages/vacuum/gold/day1/Field_5.10.20Vcm_FibreIn_0%d.%d.ch3.10_averaged.root", u, v));
 
-      TFile *f1 = new TFile(Form("gold/times/gold_average_%d.%d_fitvalues%d_PreAmpFunc_first24_gas_ar_anode_times.root", u, v), "recreate");
-
-      TTree *timetree = new TTree("Timetree", "Timetree");
-
-      timetree->ReadFile(Form("/unix/dune/purity/stefano/gas_ar/gold/first_24_hours/Field_60.120.240Vcm_FibreIn_0%d.0%d.ch3.traces.times", u, v), "nro1/C:min/D:hours/D:day/D:month/D:year/D:nro2/C",  ',');
-
-      timetree->Fill();
-      f1->Write();
-      f1->Close();
-
-
-
-    for (int i=0; i<1; i++) {
+      //averaging wave forms
+    for (int i=1; i<10; i++) {
       TCanvas *canvas = new TCanvas("canvas");     
-      TGraph *cat_raw = (TGraph*)f3->Get(Form("graph_%d", i));
+      TGraph *cat_raw = (TGraph*)f3->Get(Form("graph%d", i));
       cout << cat_raw->GetN() << endl;
-       double error[1000], x[1000]={0}, y[1000]={0};
+       double error[200], x[200]={0}, y[200]={0};
       for (int s=0; s<200; s++) {
 	//error[s] = 0;
 	error[s] = TMath::Sqrt(cat_raw->GetRMS());
-      for (int r=s*100; r<(s+1)*100; r++) {
+      for (int r=s*500; r<(s+1)*500; r++) {
           x[s] += cat_raw->GetX()[r];
           y[s] += cat_raw->GetY()[r];
       	}
-       x[s]/=100;
-       y[s]/=100;
+       x[s]/=500;
+       y[s]/=500;
 
        }
 
       TGraphErrors *cat = new TGraphErrors(200, x, y, 0, error);
       cat->Draw();
-
-      //TGraph *cat = (TGraph*)f3->Get("graph1");
       
-      //TF1 *fun= new TF1("fun", function, -0.0005, 0.005, 6);
-
-      //fun->SetParName(0, "Q_0");
-      //fun->SetParName(1, "G_0");
-      //fun->SetParName(2, "t1");
-      //fun->SetParName(3, "taulife");
-      // fun->SetParName(4, "tauel");
-      //fun->SetParName(5, "t0");
-
-      //fun->FixParameter(1, 1);
-      //fun->FixParameter(3,9.37e-5);
-      //fun->FixParameter(3, 0.00122);
-
-      //fun->SetParameter(3, 1e-4);
-      //fun->SetParLimits(3, 1e-6, 1e-2);
-      //fun->SetParameter(5, 0);
-
-      //fun->SetParameter(0, -0.8);
-      //fun->SetParameter(2, 1.3e-5);
-      //fun->SetParameter(2, 1e-5);
-      //fun->SetParameter(4, 6.5e-5);
-      //fun->SetParameter(4, 3e-4);
-  
-      //fun->SetParLimits(0, -1.5, -0.7);
-      //fun->SetParLimits(2, 1e-5, 3e-5);
-      //fun->SetParLimits(2, 5e-6, 2e-5);
-      //fun->SetParLimits(4, 1e-5, 5e-4);
-      //fun->SetParLimits(4, 7e-5, 5e-4);
-      //fun->Print();
-      //ROOT::Math::MinimizerOptions::SetDefaultPrintLevel(-1);
-      //TVirtualFitter::SetMaxIterations(1000000);                                                                  
-      //TVirtualFitter::SetPrecision(5000);
-
       TF1 *fun= new TF1("fun", funcPreamp2,-0.0005, 0.005, 6);
       fun->SetParName(0, "Baseline");
       fun->SetParName(1, "Q");
@@ -121,6 +77,8 @@ void Pr3_fitting_cathode() {
       fun->Draw("same");
       //cout << u << " " << v << endl;
       canvas->Print(Form("gold/gold_%d.%d_graph%d_first24_gas_ar.png", u, v, i));
+      
+      //calculating number of files and fails
             
       if (status != 0){
         t += 1;
@@ -129,7 +87,7 @@ void Pr3_fitting_cathode() {
       l+=1;
 
 
-      //f3->Close();
+      //creating a file for the fitting elements
       TFile *file = new TFile(Form("gold/gold_%d.%d_fitvalues%d_first24_gas_ar.root", u, v, i), "recreate");
       TTree *tree = new TTree("Tree", "Tree");
 
@@ -176,8 +134,6 @@ void Pr3_fitting_cathode() {
   
   }
 }
-//cout << "failures" << " " << t << endl;
-//cout << "Number of files" << " " << l << endl;
 
 Double_t function(double *x, double *par){
   double G_0 = par[0];
