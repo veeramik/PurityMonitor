@@ -228,3 +228,4 @@ Double_t function(double *x, double *par){
   f4 = (TMath::Exp(-x[0]/tauel))*(TMath::Exp(-t1/taulife));
   return f2*f3*f4;
 }
+# PurityMonitor
