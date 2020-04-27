@@ -7,7 +7,7 @@ void Pr3_summaryplots_cat_and_ano(){
 
   double x[360], t_3[360], t_2[360], Q_a[360];
   double x_2[360], t_1[360], Q_k[360];
-  double time_min[450], time_hours[450], tot_time[450];
+  double time_min[500], time_hours[500], tot_time[500];
   int k=0;
   //int p=0;
 
@@ -133,12 +133,9 @@ void Pr3_summaryplots_cat_and_ano(){
      else{
      double min, hours;
      cout << a << " " << b << endl;
-     //TFile *f3 = new TFile(Form("gold/times/gold_average_%d.%d_fitvalues0_PreAmpFunc_first24_gas_ar_anode_times.root", a, b), "read");
-     //TTree *timechain = (TTree*)f3->("Timetree");
-     timechain->Add(Form("gold/times/gold_average_%d.%d_fitvalues0_PreAmpFunc_first24_gas_ar_anode_times.root", a, b));
-     //timechain->SetBranchAddress("hours", &hours);
-     //timechain->SetBranchAddress("min", &min);
-     }
+     TFile *f3 = new TFile(Form("gold/times/gold_average_%d.%d_fitvalues0_PreAmpFunc_first24_gas_ar_anode_times.root", a, b), "read");
+     TTree *timechain = (TTree*)f3->("Timetree");
+     //timechain->Add(Form("gold/times/gold_average_%d.%d_fitvalues0_PreAmpFunc_first24_gas_ar_anode_times.root", a, b));
      timechain->SetBranchAddress("hours", &hours);
      timechain->SetBranchAddress("min", &min);
      auto entries2 = timechain->GetEntries();
@@ -157,17 +154,18 @@ void Pr3_summaryplots_cat_and_ano(){
        tot_time[k2] = (hours-9)+0.01*min;
        cout << tot_time[k2] << " " << k2 << endl;
        k2+=1;  
-     }    
-     //k2+=1;  
+     } 
+     
 
-     // }
-     //k2+=1;
-    
      }
      
+    
+     }
+          
     }
-  
+     
   }
+  
 
   double d1=0.01823;
   double d2=0.16424;
