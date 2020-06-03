@@ -9,12 +9,12 @@ void Pr3_summaryplots_waveforms(){
 
    for (int j=0; j<1001; j++){
 
-    Bool_t f = gSystem->AccessPathName(Form("silver/vacuum/waveforms/vacuum_10.3_waveform%d_500.root", j));
+    Bool_t f = gSystem->AccessPathName(Form("silver/vacuum/waveforms/vacuum_10.3_waveform%d_50.root", j));
      if (f){
       continue;
       }
       else{
-	chain->Add(Form("silver/vacuum/waveforms/vacuum_10.3_waveform%d_500.root", j));
+	chain->Add(Form("silver/vacuum/waveforms/vacuum_10.3_waveform%d_50.root", j));
 	double max, min, status;
 	chain->SetBranchAddress("max", &max);
 	chain->SetBranchAddress("min", &min);
@@ -33,12 +33,12 @@ void Pr3_summaryplots_waveforms(){
 
    int k1=0;
    for (int h=0; h<1001; h++){
-     Bool_t f1 = gSystem->AccessPathName(Form("silver/vacuum/waveforms/vacuum_10.3_waveform%d_500_anode.root", h));
+     Bool_t f1 = gSystem->AccessPathName(Form("silver/vacuum/waveforms/vacuum_10.3_waveform%d_50_anode.root", h));
      if (f1){
       continue;
      }
      else{
-       chain2->Add(Form("silver/vacuum/waveforms/vacuum_10.3_waveform%d_500_anode.root", h));
+       chain2->Add(Form("silver/vacuum/waveforms/vacuum_10.3_waveform%d_50_anode.root", h));
        double max_cat, min_cat;
        chain2->SetBranchAddress("max", &max_cat);
        chain2->SetBranchAddress("min", &min_cat);
@@ -48,8 +48,8 @@ void Pr3_summaryplots_waveforms(){
 	 //cout << max_cat << endl;
 	 Q_a[k1] = max_cat-min_cat;
 	 x1[k1] = h;
-       }
-       //cout << Q_a[k1]-Q_k[k1] << " " << h << endl;
+	}
+       cout << Q_a[k1]-Q_k[k1] << " " << h << endl;
        k1+=1;
      }
    }
@@ -66,10 +66,11 @@ void Pr3_summaryplots_waveforms(){
    cat->SetMarkerStyle(21);
    cat->SetMarkerSize(0.8);
    cat->SetName("cathode");
-   cat->SetTitle("cathode"); 
-   cat->Draw("AP");
-   cat->Fit("pol1");
-   double slope_cat = cat->GetFunction("pol1")->GetParameter(1);
+   cat->SetTitle("cathode");
+   //cat->GetYAxis->SetMinimum(3);
+   //cat->Draw("AP");
+   //cat->Fit("pol1");
+   //double slope_cat = cat->GetFunction("pol1")->GetParameter(1);
 
    TGraph* ano = new TGraph(n, x1, Q_a);
    ano->SetMarkerColor(4);
@@ -77,19 +78,24 @@ void Pr3_summaryplots_waveforms(){
    ano->SetMarkerSize(0.8);
    ano->SetName("anode");
    ano->SetTitle("anode"); 
-   ano->Draw("AP");
-   ano->Fit("pol1");
-   double slope_ano = ano->GetFunction("pol1")->GetParameter(1);
+   //ano->GetYAxis()->SetMinimum(3);
+   //ano->Draw("AP");
+   //ano->Fit("pol1");
+   //double slope_ano = ano->GetFunction("pol1")->GetParameter(1);
  
-   cout << slope_cat << " " << slope_ano << endl;
+   //cout << slope_cat << " " << slope_ano << endl;
 
    TMultiGraph* gr = new TMultiGraph("Q_k and Q_a", "Q_k and Q_a for silver");
    gr->Add(cat);
    gr->Add(ano);
 
    gr->Draw("AP");
+   //gPad->Modified();
+   gr->SetMinimum(3.5);
+   //gpad->Modified();
+   //gpad->Update();
    canvas->BuildLegend();
-   canvas->Print("silver_vacuum_10.3_waveforms_500averaging.png");
+   canvas->Print("silver_vacuum_10.3_waveforms_50averaging.png");
    canvas->Close();
 
 }
