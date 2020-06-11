@@ -2,48 +2,60 @@ void Pr3_waveforms() {
 
   TCanvas *canvas = new TCanvas("canvas");
   
-      Bool_t f = gSystem->AccessPathName("/unix/dune/purity/abf/vacuum_10.03.2020/silver/30.60.120Vcm.ch4.traces.root");
+      Bool_t f = gSystem->AccessPathName("/unix/dune/purity/abf/vacuum_10.03.2020/silver/30.60.120Vcm.ch3.traces.root");
 
       if (f){
         continue;
       }
 
       else{
-      TFile *f3 = new TFile("/unix/dune/purity/abf/vacuum_10.03.2020/silver/30.60.120Vcm.ch4.traces.root"), "read");
-      for (int i=1; i<2; i++) {
-          TCanvas *canvas = new TCanvas("canvas");
-          TGraph *ano_raw = (TGraph*)f3->Get(Form("graph%d", i));
-          double error[500], x[500]={0}, y[500]={0};
-	  for (int s=0; s<500; s++) {
-	    error[s] = TMath::Sqrt(ano_raw->GetRMS());
-            for (int r=s*200; r<(s+1)*200; r++) {
-              x[s] += ano_raw->GetX()[r];
-              y[s] += ano_raw->GetY()[r];
+      TFile *f3 = new TFile("/unix/dune/purity/abf/vacuum_10.03.2020/silver/30.60.120Vcm.ch3.traces.root"), "read");
+      //for (int i=2; i<3; i++) {
+      //    TCanvas *canvas = new TCanvas("canvas");
+      //    TGraph *ano_raw = (TGraph*)f3->Get(Form("graph%d", i));
+      //    double error[500], x[500]={0}, y[500]={0};
+      //  for (int s=0; s<500; s++) {
+      //    error[s] = TMath::Sqrt(ano_raw->GetRMS());
+      //    for (int r=s*200; r<(s+1)*200; r++) {
+      //      x[s] += ano_raw->GetX()[r];
+      //      y[s] += ano_raw->GetY()[r];
 	      //cout << y[s] << " " << s << endl;
-	     }
-            x[s]/=200;
-            y[s]/=200;
+      //     }
+      //    x[s]/=200;
+      //    y[s]/=200;
 	    //cout << y[s] << " " << s << endl;
-           }
+      //   }
 
-	  double CMA_y[100002];
-	  for (int j=5; j<6; j++) {                                                                                                 
+	  double x_1[1000], y_1[1000], error_1[1000];
+	  for (int j=500; j<501; j++) {                                                                                                 
 	  TCanvas *canvas = new TCanvas("canvas");                                                                                 
 	  TGraph *ano_raw = (TGraph*)f3->Get(Form("graph%d", j));
-	  for(int t=0; t<100002; t++){
-	   CMA_y[t] = ano_raw->GetY()[t];
-	   //cout << CMA_y[t] << " " << t << endl;
-	   }
 	  for(int d=0; d<1000; d++){
+	    //cout << d << endl;
 	    error_1[d] = TMath::Sqrt(ano_raw->GetRMS());
-	    for (int e=(d-1)*100; e<(d)*100; e++){
-	      
-	    }	    
+	    if (d==0){
+	      for (int e=d; e<100; e++){
+		y_1[d] += ano_raw->GetY()[e];
+		x_1[d] += ano_raw->GetX()[e];
+		//cout << y_1[d] << " " << d << endl;
+	    }
+	      y_1[d]/=100;
+	      x_1[d]/=100;
+	      //cout << y_1[d] << " " << d << endl; 
+	    }
+	     else{
+	      for (int e=(d*100-1); e<(d+1)*100; e++){<
+		y_1[d] += ano_raw->GetY()[e];
+		x_1[d] += ano_raw->GetX()[e];
+		//cout << y_1[d] << " " << d << endl;
+	    }	   
+	      y_1[d]/=100;
+	      x_1[d]/=100;
+	      //cout << y_1[d] << " " << d << endl; 
+	     }
 	  }
 
-	  }
-
-
+	  
 	  //for (int j=1; j<2; j++) {
 	  //TCanvas *canvas = new TCanvas("canvas");
 	  //TGraph *ano_raw = (TGraph*)f3->Get(Form("graph%d", j));
@@ -61,12 +73,12 @@ void Pr3_waveforms() {
 	  
 	  //}
 
-          TGraphErrors *ano = new TGraphErrors(100002, x_1, y_1, 0, error_1);
+          TGraphErrors *ano = new TGraphErrors(1000, x_1, y_1, 0, error_1);
 	  //ano->GetXaxis()->SetLimits(-0.00001, 0.00005);
           //ano->SetMaximum(-3);
 	  //ano->SetMinimum(-4.2);
 	  ano->Draw();
-	  canvas->Print(Form("silver/vacuum/waveforms/vacuum_10.3_waveform%d_rollingaverage.png", i), "recreate");
+	  canvas->Print(Form("silver/vacuum/waveforms/vacuum_10.3_waveform%d_rollingaverage_anode.png", j), "recreate");
 	  
 	  //double max TMath::MaxElement(n,ano->GetY());
 	  //double max = ano->->GetHistogram()->GetMinimum(); 
@@ -78,7 +90,7 @@ void Pr3_waveforms() {
 	  double max = TMath::MaxElement(ano->GetN(),ano->GetY());
 	  cout << max << " "  << min << endl;
 	  cout << max-min << endl;
-	  TFile *file = new TFile(Form("silver/vacuum/waveforms/vacuum_10.3_waveform%d_rollingaverage.root", i), "recreate");
+	  TFile *file = new TFile(Form("silver/vacuum/waveforms/vacuum_10.3_waveform%d_rollingaverage_anode.root", j), "recreate");
 	  TTree *tree = new TTree("Tree", "Tree");
 	  tree->Branch("max", &max);
 	  tree->Branch("min", &min);
