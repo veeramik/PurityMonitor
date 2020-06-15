@@ -7,6 +7,19 @@ void Pr3_waveforms_baseline() {
   for (int j=1; j<2; j++) {
     TCanvas *canvas = new TCanvas("canvas");                                                              
     TGraph *ano_raw = (TGraph*)f3->Get(Form("graph%d", j));
+
+    //double x_raw[3600], y_raw[3600];                                                                                                                
+    double baseline;
+    double y_raw1;
+    for(int t=0; t<100002; t++){
+      if(ano_raw->GetX()[t]<=0){
+       y_raw1 += ano_raw->GetY()[t];
+        //cout << ano_raw->GetY()[k] << " " << k << endl;                                                                                            
+      }
+    }
+    baseline = y_raw1/7600;
+    // cout << baseline << endl;
+
     for(int d=0; d<666; d++){
       error_1[d] = 0;
       //error_1[d] = TMath::Sqrt(ano_raw->GetRMS());
@@ -28,11 +41,13 @@ void Pr3_waveforms_baseline() {
       }
   }
 
+    //double x_roll[23], y_roll[23];  
     double x_roll[50], y_roll[50];
     for(int g=0; g<666; g++){
+      //if(x_1[g]<= -0.00002){
       if (x_1[g]<=0){
 	x_roll[g] = x_1[g];
-	y_roll[g] = y_1[g];
+	y_roll[g] = y_1[g]-baseline;
 	//cout << y_1[g] << " " << g << endl;
       }
     }
@@ -57,11 +72,13 @@ void Pr3_waveforms_baseline() {
       }
     }
 
+    //double x_roll2[6], y_roll2[6];
     double x_roll2[14], y_roll2[14];
     for(int n=0; n<200; n++){
+      //if(x_2[n]<= -0.00002){
       if (x_2[n]<=0){
         x_roll2[n] = x_2[n];
-        y_roll2[n] = y_2[n];
+        y_roll2[n] = y_2[n]-baseline;
         //cout << y_2[n] << " " << n << endl;                                                                                                         
       }
     }
@@ -86,12 +103,14 @@ void Pr3_waveforms_baseline() {
       }
     }
 
-    double x_roll3[759], y_roll3[759];
+    double x_roll3[760], y_roll3[760];
     for(int q=0; q<10000; q++){
-      if (x_3[q]<=0){
+      //if(x_3[q]<= -0.00002){                                                                                                     \
+                                                                                                                                    
+      if (x_3[q]<0){
         x_roll3[q] = x_3[q];
-        y_roll3[q] = y_3[q];
-        //cout << y_3[q] << " " << q << endl;
+        y_roll3[q] = y_3[q]-baseline;
+        //cout << y_3[q] << " " << q << " " <<  endl;
       }
     }
 
@@ -106,21 +125,25 @@ void Pr3_waveforms_baseline() {
       y[s]/=150;                                                                                                       
         }            
 
+    //double x_box[23], y_box[23];
     double x_box[50], y_box[50];
     for(int i=0; i<666; i++){
-      if(x[i]<=0){
+      //if(x[i]<= -0.00002){
+       if(x[i]<=0){
 	x_box[i] = x[i];
-	y_box[i] = y[i];
+	y_box[i] = y[i]-baseline;
         //cout << y[i] << " " << i << endl;
       }
     }
 
-     double x_raw[7600], y_raw[7600]; 
+    //double x_raw[3600], y_raw[3600];
+    double x_raw[7600], y_raw[7600]; 
     for(int k=0; k<100002; k++){
       //cout << ano_raw->GetX()[k]<< endl;
+      //if(ano_raw->GetX()[k]<= -0.00002){  
       if(ano_raw->GetX()[k]<=0){
         x_raw[k] = ano_raw->GetX()[k];
-        y_raw[k] = ano_raw->GetY()[k];
+        y_raw[k] = ano_raw->GetY()[k]-baseline;
 	//cout << ano_raw->GetY()[k] << " " << k << endl;
         }
     }
@@ -153,26 +176,24 @@ void Pr3_waveforms_baseline() {
     ano_roll2->SetTitle("Rolling average 500");
     //ano_roll->Draw();   
 
-    TGraph *ano_roll3 = new TGraph(759, x_roll3, y_roll3);
+    TGraph *ano_roll3 = new TGraph(760, x_roll3, y_roll3);
     ano_roll3->SetLineColor(3);
     ano_roll3->SetLineWidth(3);
     ano_roll3->SetName("Rolling average 10");
     ano_roll3->SetTitle("Rolling average 10");
     //ano_roll->Draw();     
     
-    TMultiGraph* gr = new TMultiGraph("Baseline for different averaging", "Baseline for different averaging");
+    TMultiGraph* gr = new TMultiGraph("Baseline for different averaging", "Baseline for different anode averaging;Time (s);Voltage(V)");
     gr->Add(ano_raw1);
+    gr->Add(ano_roll3);
     gr->Add(ano_roll);
     gr->Add(ano_roll2);
-    gr->Add(ano_roll3);
-    gr->Add(ano_box);
-
-    gr->SetMinimum(-40e-6);
-    gr->SetMaximum(-30e-6);
-
-    gr->Draw("APL");
+    //gr->Add(ano_box);
+    
+    gr->Draw("AL");
+    //gr->GetXaxis()->SetLimits(-3e.7, 2e-7);
     canvas->BuildLegend();
-    //canvas->Print(Form("silver_vacuum_10.3_waveform%d_baseline.png", j));
+    canvas->Print(Form("silver_vacuum_10.3_waveform%d_anodebaseline_baseline.png", j));
     //canvas->Close();
 
     //canvas->Print(Form("silver/vacuum/waveforms/vacuum_10.3_waveform%d_baseline.png", j));
